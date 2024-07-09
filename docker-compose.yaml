@@ -1,0 +1,39 @@
+version: "3.9"
+
+services:
+  flask-app:
+    depends_on:
+      - db
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - MYSQL_HOST=db
+      - MYSQL_USER=flask_app_user
+      - MYSQL_PASSWORD=root
+      - MYSQL_DB=my_flask_app_database
+
+  db:
+    image: mysql:latest
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=flask_app_user
+      - MYSQL_PASSWORD=root
+      - MYSQL_DATABASE=my_flask_app_database
+    ports:
+      - "3306:3306"
+    volumes:
+      - /root/eval_docker/db_data:/var/lib/mysql
+      - ./app.sql:/docker-entrypoint-initdb.d/app.sql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      - PMA_HOST=db
+      - MYSQL_ROOT_PASSWORD=root
+    depends_on:
+      - db
+
+
